@@ -88,5 +88,3 @@ def send_email(receiver, attachment):
         server.login(SENDER_EMAIL, EMAIL_PASSWORD)
         server.send_message(msg)
 
-if __name__ == "__main__":
-    app.run()
