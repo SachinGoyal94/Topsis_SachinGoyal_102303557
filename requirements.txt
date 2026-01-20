@@ -6,3 +6,4 @@ gunicorn
 fastapi
 uvicorn
 python-multipart
+mailjet_rest
