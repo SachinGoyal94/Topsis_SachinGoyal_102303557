@@ -19,9 +19,7 @@ EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 def secure_filename(name):
     return re.sub(r"[^A-Za-z0-9_.-]", "_", name)
 
-@app.route('/')
-def index():
-    return render_template("index.html")
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
