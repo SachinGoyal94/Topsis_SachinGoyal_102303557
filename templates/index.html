@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>TOPSIS Web Service</title>
+    <style>
+        :root{
+            --bg:#f5f7fb;
+            --card:#ffffff;
+            --accent:#2b7aeb;
+            --muted:#6b7280;
+            --radius:10px;
+            --max-width:720px;
+        }
+        body{
+            margin:0;
+            font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, var(--bg), #eef3ff);
+            color:#111827;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            min-height:100vh;
+            padding:24px;
+        }
+        .card{
+            width:100%;
+            max-width:var(--max-width);
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:0 6px 20px rgba(18,38,63,0.08);
+            padding:28px;
+        }
+        h1{font-size:20px;margin:0 0 6px 0}
+        p.lead{margin:0 0 18px 0;color:var(--muted)}
+        form .row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+        label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+        input[type="text"], input[type="email"], .file-input {
+            width:100%;
+            padding:10px 12px;
+            border:1px solid #e6edf6;
+            border-radius:8px;
+            background:#fbfdff;
+            font-size:14px;
+            box-sizing:border-box;
+        }
+        .two-up{flex:1 1 48%;}
+        .full{flex:1 1 100%;}
+        .file-row{display:flex;align-items:center;gap:12px}
+        .file-name{font-size:13px;color:var(--muted)}
+        .hint{font-size:12px;color:var(--muted);margin-top:6px}
+        .btn{
+            display:inline-block;
+            background:var(--accent);
+            color:white;
+            padding:10px 16px;
+            border-radius:8px;
+            border:none;
+            cursor:pointer;
+            font-weight:600;
+            font-size:14px;
+        }
+        .btn:disabled{opacity:0.6;cursor:not-allowed}
+        footer{margin-top:16px;font-size:12px;color:var(--muted)}
+        @media (max-width:520px){
+            .two-up{flex:1 1 100%}
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>TOPSIS Calculator</h1>
+        <p class="lead">Upload a CSV, provide weights and impacts, and get TOPSIS results emailed to you.</p>
+
+        <form action="/submit" method="post" enctype="multipart/form-data" id="topsis-form">
+            <div class="row full">
+                <div style="width:100%">
+                    <label for="file">Upload CSV file</label>
+                    <div class="file-row">
+                        <input class="file-input" id="file" name="file" type="file" accept=".csv" required>
+                        <div class="file-name" id="file-name">No file chosen</div>
+                    </div>
+                    <div class="hint">CSV must have an identifier column first, then numeric criteria columns.</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="two-up">
+                    <label for="weights">Weights (comma separated)</label>
+                    <input type="text" id="weights" name="weights" placeholder="e.g. 1,1,1" required>
+                </div>
+
+                <div class="two-up">
+                    <label for="impacts">Impacts (comma separated)</label>
+                    <input type="text" id="impacts" name="impacts" placeholder="e.g. +,+,-" required>
+                </div>
+
+                <div class="full">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+            </div>
+
+            <div style="margin-top:10px;display:flex;gap:10px;align-items:center;justify-content:flex-start;flex-wrap:wrap">
+                <button class="btn" type="submit">Submit</button>
+                <button type="button" class="btn" id="example-btn" style="background:#10b981">Load example</button>
+                <div style="color:var(--muted);font-size:13px">or <a href="#" id="download-sample">download sample CSV</a></div>
+            </div>
+        </form>
+
+        <footer>
+            Tip: weights are numeric and impacts should be + (benefit) or - (cost). The service will compute a Topsis Score and Rank for each row.
+        </footer>
+    </div>
+
+    <script>
+        // Show chosen file name
+        const fileInput = document.getElementById('file');
+        const fileNameEl = document.getElementById('file-name');
+        fileInput.addEventListener('change', function(){
+            const f = this.files && this.files[0];
+            fileNameEl.textContent = f ? f.name : 'No file chosen';
+        });
+
+        // Provide a tiny example CSV to download
+        document.getElementById('download-sample').addEventListener('click', function(e){
+            e.preventDefault();
+            const csv = 'Name,Cost,Performance,Quality\nA,250,8,9\nB,200,7,8\nC,300,9,7';
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'sample_topsis.csv';
+            document.body.appendChild(a); a.click(); a.remove();
+            URL.revokeObjectURL(url);
+        });
+
+        // Load example values into the form (does not submit)
+        document.getElementById('example-btn').addEventListener('click', function(){
+            document.getElementById('weights').value = '1,1,1';
+            document.getElementById('impacts').value = '+,+,-';
+            document.getElementById('email').value = '';
+        });
+
+        // Basic client-side validation to help the user
+        document.getElementById('topsis-form').addEventListener('submit', function(e){
+            const weights = document.getElementById('weights').value.trim();
+            const impacts = document.getElementById('impacts').value.trim();
+            if(!weights || !impacts){
+                alert('Please fill in weights and impacts');
+                e.preventDefault();
+                return;
+            }
+            const wParts = weights.split(',').map(s=>s.trim()).filter(Boolean);
+            const iParts = impacts.split(',').map(s=>s.trim()).filter(Boolean);
+            if(wParts.length !== iParts.length){
+                alert('Number of weights must match number of impacts');
+                e.preventDefault();
+                return;
+            }
+            if(!iParts.every(x=>x==='+'||x==='-')){
+                alert('Impacts must be + or -');
+                e.preventDefault();
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

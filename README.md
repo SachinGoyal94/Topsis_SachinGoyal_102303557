@@ -26,6 +26,16 @@ Open a terminal and run:
 
 Or create a virtual environment first, then install the same packages.
 
+Install from PyPI
+
+This package is published to PyPI. You can install the released package directly:
+
+    pip install topsis-sachingoyal-102303557==1.0.0
+
+Project page on PyPI:
+
+https://pypi.org/project/topsis-sachingoyal-102303557/1.0.0/
+
 Usage
 
 There are two simple ways to run the script.
