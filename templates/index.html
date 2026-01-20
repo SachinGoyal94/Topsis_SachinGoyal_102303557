@@ -7,15 +7,18 @@
     <style>
         :root{
             --bg:#f5f7fb;
-            --card:#ffffff;
+            --card:#fff;
             --accent:#2b7aeb;
+            --accent-dark:#1e5fa8;
+            --success:#10b981;
+            --error:#ef4444;
             --muted:#6b7280;
-            --radius:10px;
-            --max-width:720px;
+            --radius:12px;
+            --max-width:420px;
         }
         body{
             margin:0;
-            font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
             background: linear-gradient(180deg, var(--bg), #eef3ff);
             color:#111827;
             display:flex;
@@ -29,29 +32,50 @@
             max-width:var(--max-width);
             background:var(--card);
             border-radius:var(--radius);
-            box-shadow:0 6px 20px rgba(18,38,63,0.08);
-            padding:28px;
+            box-shadow:0 8px 32px rgba(18,38,63,0.10);
+            padding:32px 28px 24px 28px;
+            position:relative;
         }
-        h1{font-size:20px;margin:0 0 6px 0}
-        p.lead{margin:0 0 18px 0;color:var(--muted)}
+        .header{
+            display:flex;align-items:center;gap:12px;margin-bottom:8px;
+        }
+        .header-icon{
+            width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+            background:var(--accent);color:white;border-radius:50%;font-size:22px;box-shadow:0 2px 8px #2b7aeb22;
+        }
+        h1{font-size:22px;margin:0 0 2px 0;letter-spacing:-1px;}
+        p.lead{margin:0 0 18px 0;color:var(--muted);font-size:15px;}
+        .msg{
+            min-height:28px;
+            margin-bottom:10px;
+            font-size:15px;
+            text-align:center;
+            font-weight:500;
+        }
+        .msg.success{color:var(--success);}
+        .msg.error{color:var(--error);}
         form .row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-        label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+        label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.2px;}
         input[type="text"], input[type="email"], .file-input {
             width:100%;
             padding:10px 12px;
-            border:1px solid #e6edf6;
+            border:1.5px solid #e6edf6;
             border-radius:8px;
             background:#fbfdff;
-            font-size:14px;
+            font-size:15px;
             box-sizing:border-box;
+            transition:border 0.2s;
         }
-        .two-up{flex:1 1 48%;}
-        .full{flex:1 1 100%;}
+        input[type="text"]:focus, input[type="email"]:focus, .file-input:focus {
+            border:1.5px solid var(--accent);
+            outline:none;
+        }
+        .two-up{flex:1 1 48%}
+        .full{flex:1 1 100%}
         .file-row{display:flex;align-items:center;gap:12px}
         .file-name{font-size:13px;color:var(--muted)}
         .hint{font-size:12px;color:var(--muted);margin-top:6px}
         .btn{
-            display:inline-block;
             background:var(--accent);
             color:white;
             padding:10px 16px;
@@ -59,111 +83,149 @@
             border:none;
             cursor:pointer;
             font-weight:600;
-            font-size:14px;
+            font-size:15px;
+            transition:background 0.18s;
         }
-        .btn:disabled{opacity:0.6;cursor:not-allowed}
-        footer{margin-top:16px;font-size:12px;color:var(--muted)}
+        .btn.secondary{background:var(--success)}
+        .btn:active{background:var(--accent-dark)}
+        .btn[disabled]{opacity:0.6;cursor:not-allowed}
+        .spinner{
+            display:inline-block;width:22px;height:22px;border:3px solid #e0e7ef;border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-left:8px;
+        }
+        @keyframes spin{to{transform:rotate(360deg)}}
+        footer{margin-top:18px;font-size:12px;color:var(--muted);text-align:center;}
         @media (max-width:520px){
             .two-up{flex:1 1 100%}
+            .card{padding:18px 6vw 16px 6vw;}
         }
     </style>
 </head>
 <body>
-    <div class="card">
+<div class="card">
+    <div class="header">
+        <div class="header-icon" aria-hidden="true">&#128202;</div>
         <h1>TOPSIS Calculator</h1>
-        <p class="lead">Upload a CSV, provide weights and impacts, and get TOPSIS results emailed to you.</p>
-
-        <form action="/submit" method="post" enctype="multipart/form-data" id="topsis-form">
-            <div class="row full">
-                <div style="width:100%">
-                    <label for="file">Upload CSV file</label>
-                    <div class="file-row">
-                        <input class="file-input" id="file" name="file" type="file" accept=".csv" required>
-                        <div class="file-name" id="file-name">No file chosen</div>
-                    </div>
-                    <div class="hint">CSV must have an identifier column first, then numeric criteria columns.</div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="two-up">
-                    <label for="weights">Weights (comma separated)</label>
-                    <input type="text" id="weights" name="weights" placeholder="e.g. 1,1,1" required>
-                </div>
-
-                <div class="two-up">
-                    <label for="impacts">Impacts (comma separated)</label>
-                    <input type="text" id="impacts" name="impacts" placeholder="e.g. +,+,-" required>
-                </div>
-
-                <div class="full">
-                    <label for="email">Email address</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
-                </div>
-            </div>
-
-            <div style="margin-top:10px;display:flex;gap:10px;align-items:center;justify-content:flex-start;flex-wrap:wrap">
-                <button class="btn" type="submit">Submit</button>
-                <button type="button" class="btn" id="example-btn" style="background:#10b981">Load example</button>
-                <div style="color:var(--muted);font-size:13px">or <a href="#" id="download-sample">download sample CSV</a></div>
-            </div>
-        </form>
-
-        <footer>
-            Tip: weights are numeric and impacts should be + (benefit) or - (cost). The service will compute a Topsis Score and Rank for each row.
-        </footer>
     </div>
+    <p class="lead">Upload a CSV, enter weights and impacts, and receive the TOPSIS result via email.</p>
+    <div id="msg" class="msg" aria-live="polite"></div>
+    <form id="topsis-form" enctype="multipart/form-data" autocomplete="off" novalidate>
+        <div class="row full">
+            <div style="width:100%">
+                <label for="file">Upload CSV file</label>
+                <div class="file-row">
+                    <input class="file-input" id="file" type="file" accept=".csv" required aria-required="true">
+                    <div class="file-name" id="file-name">No file chosen</div>
+                </div>
+                <div class="hint">First column = identifier, remaining columns = numeric criteria</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="two-up">
+                <label for="weights">Weights (comma separated)</label>
+                <input type="text" id="weights" placeholder="1,1,1" required aria-required="true" autocomplete="off">
+            </div>
+            <div class="two-up">
+                <label for="impacts">Impacts (comma separated)</label>
+                <input type="text" id="impacts" placeholder="+,+,-" required aria-required="true" autocomplete="off">
+            </div>
+            <div class="full">
+                <label for="email">Email address</label>
+                <input type="email" id="email" placeholder="you@example.com" required aria-required="true" autocomplete="off">
+            </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" type="submit" id="submit-btn">Submit</button>
+            <button class="btn secondary" type="button" id="example-btn">Load Example</button>
+        </div>
+        <div id="spinner" class="spinner" style="display:none" aria-label="Loading"></div>
+    </form>
+    <footer>
+        Weights must be numeric. Impacts must be + (benefit) or - (cost).
+    </footer>
+</div>
+<script>
+    const BACKEND_URL = "https://topsis-sachingoyal-102303557.onrender.com"; // 🔴 CHANGE THIS
+    const fileInput = document.getElementById("file");
+    const fileNameEl = document.getElementById("file-name");
+    const msgEl = document.getElementById("msg");
+    const spinner = document.getElementById("spinner");
+    const submitBtn = document.getElementById("submit-btn");
 
-    <script>
-        // Show chosen file name
-        const fileInput = document.getElementById('file');
-        const fileNameEl = document.getElementById('file-name');
-        fileInput.addEventListener('change', function(){
-            const f = this.files && this.files[0];
-            fileNameEl.textContent = f ? f.name : 'No file chosen';
-        });
+    fileInput.addEventListener("change", () => {
+        fileNameEl.textContent = fileInput.files[0]?.name || "No file chosen";
+    });
 
-        // Provide a tiny example CSV to download
-        document.getElementById('download-sample').addEventListener('click', function(e){
-            e.preventDefault();
-            const csv = 'Name,Cost,Performance,Quality\nA,250,8,9\nB,200,7,8\nC,300,9,7';
-            const blob = new Blob([csv], {type: 'text/csv'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'sample_topsis.csv';
-            document.body.appendChild(a); a.click(); a.remove();
-            URL.revokeObjectURL(url);
-        });
+    document.getElementById("example-btn").addEventListener("click", () => {
+        document.getElementById("weights").value = "1,1,1";
+        document.getElementById("impacts").value = "+,+,-";
+        document.getElementById("email").value = "";
+        msgEl.textContent = "";
+    });
 
-        // Load example values into the form (does not submit)
-        document.getElementById('example-btn').addEventListener('click', function(){
-            document.getElementById('weights').value = '1,1,1';
-            document.getElementById('impacts').value = '+,+,-';
-            document.getElementById('email').value = '';
-        });
+    document.getElementById("topsis-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msgEl.textContent = "";
+        msgEl.className = "msg";
+        submitBtn.disabled = true;
+        spinner.style.display = "inline-block";
 
-        // Basic client-side validation to help the user
-        document.getElementById('topsis-form').addEventListener('submit', function(e){
-            const weights = document.getElementById('weights').value.trim();
-            const impacts = document.getElementById('impacts').value.trim();
-            if(!weights || !impacts){
-                alert('Please fill in weights and impacts');
-                e.preventDefault();
+        const file = fileInput.files[0];
+        const weights = document.getElementById("weights").value.trim();
+        const impacts = document.getElementById("impacts").value.trim();
+        const email = document.getElementById("email").value.trim();
+
+        if (!file || !weights || !impacts || !email) {
+            msgEl.textContent = "All fields are required";
+            msgEl.classList.add("error");
+            submitBtn.disabled = false;
+            spinner.style.display = "none";
+            return;
+        }
+        const w = weights.split(",");
+        const i = impacts.split(",");
+        if (w.length !== i.length) {
+            msgEl.textContent = "Weights and impacts count must match";
+            msgEl.classList.add("error");
+            submitBtn.disabled = false;
+            spinner.style.display = "none";
+            return;
+        }
+        if (!i.every(x => x === "+" || x === "-")) {
+            msgEl.textContent = "Impacts must be + or -";
+            msgEl.classList.add("error");
+            submitBtn.disabled = false;
+            spinner.style.display = "none";
+            return;
+        }
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("weights", weights);
+        formData.append("impacts", impacts);
+        formData.append("email", email);
+        try {
+            const res = await fetch(`${BACKEND_URL}/submit`, {
+                method: "POST",
+                body: formData
+            });
+            let data = {};
+            try { data = await res.json(); } catch {}
+            if (!res.ok) {
+                msgEl.textContent = data.detail || "Submission failed";
+                msgEl.classList.add("error");
+                submitBtn.disabled = false;
+                spinner.style.display = "none";
                 return;
             }
-            const wParts = weights.split(',').map(s=>s.trim()).filter(Boolean);
-            const iParts = impacts.split(',').map(s=>s.trim()).filter(Boolean);
-            if(wParts.length !== iParts.length){
-                alert('Number of weights must match number of impacts');
-                e.preventDefault();
-                return;
-            }
-            if(!iParts.every(x=>x==='+'||x==='-')){
-                alert('Impacts must be + or -');
-                e.preventDefault();
-                return;
-            }
-        });
-    </script>
+            msgEl.textContent = "✅ Result sent to your email successfully!";
+            msgEl.classList.add("success");
+        } catch (err) {
+            msgEl.textContent = "❌ Could not connect to backend";
+            msgEl.classList.add("error");
+        } finally {
+            submitBtn.disabled = false;
+            spinner.style.display = "none";
+        }
+    });
+</script>
 </body>
 </html>

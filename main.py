@@ -1,10 +1,11 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import re
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
-from topsis.topsis import topsis   # adjust import if needed
+from topsis.topsis import topsis   # keep this as per your structure
 
 # Load environment variables
 load_dotenv()
@@ -12,10 +13,25 @@ load_dotenv()
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
+if not SENDER_EMAIL or not EMAIL_PASSWORD:
+    raise RuntimeError("Email credentials not set in environment variables")
+
 EMAIL_REGEX = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
+# Create FastAPI app
 app = FastAPI(title="TOPSIS Backend API")
 
+# -------------------- CORS (IMPORTANT) --------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # OK for assignment/demo
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+# ----------------------------------------------------------
+
+# Create uploads folder
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -36,7 +52,7 @@ async def submit(
     if not re.match(EMAIL_REGEX, email):
         raise HTTPException(status_code=400, detail="Invalid email format")
 
-    # 2. Validate weights & impacts format (BUT keep them as strings)
+    # 2. Validate weights & impacts (keep as strings)
     weights_list = weights.split(",")
     impacts_list = impacts.split(",")
 
@@ -60,7 +76,7 @@ async def submit(
     with open(input_path, "wb") as f:
         f.write(await file.read())
 
-    # 4. Call TOPSIS (PASS STRINGS — IMPORTANT)
+    # 4. Run TOPSIS (do NOT change data type)
     topsis(input_path, weights, impacts, output_path)
 
     # 5. Send result via email
@@ -87,4 +103,3 @@ def send_email(receiver, attachment):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(SENDER_EMAIL, EMAIL_PASSWORD)
         server.send_message(msg)
-
