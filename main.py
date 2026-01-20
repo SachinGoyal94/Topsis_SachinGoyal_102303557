@@ -24,7 +24,10 @@ app = FastAPI(title="TOPSIS Backend API")
 # -------------------- CORS (IMPORTANT) --------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # OK for assignment/demo
+    allow_origins=[
+        "https://topsis-sachin-goyal-102303557.vercel.app",
+        "*"
+    ],  # Add your frontend domain(s) here
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
