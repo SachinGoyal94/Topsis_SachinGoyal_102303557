@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="topsis-sachingoyal-102303557",
+    name="topsis-sachin-102303557",
     version="1.0.0",
     author="Sachin Goyal",
     description="TOPSIS decision method Python package",
