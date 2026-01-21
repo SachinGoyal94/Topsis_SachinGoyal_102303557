@@ -1,7 +1,7 @@
 # TOPSIS Implementation - Sachin Goyal
 
 [![Python](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://www.python.org/)
-[![PyPI](https://img.shields.io/badge/PyPI-1.0.0-green.svg)](https://pypi.org/project/topsis-sachingoyal-102303557/)
+[![PyPI](https://img.shields.io/badge/PyPI-1.0.0-green.svg)](https://pypi.org/project/topsis-sachin-102303557/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A complete TOPSIS (Technique for Order Preference by Similarity to Ideal Solution) implementation in Python with both **CLI** and **Web Service** interfaces.
@@ -13,7 +13,7 @@ A complete TOPSIS (Technique for Order Preference by Similarity to Ideal Solutio
 ### 📦 Install from PyPI
 
 ```bash
-pip install topsis-sachingoyal-102303557==1.0.0
+pip install topsis-sachin-102303557
 ```
 
 ### 🌐 Try the Web Interface
@@ -221,7 +221,7 @@ ProductC,300,9,7,8,0.421,3
 
 ## 🔗 Links
 
-- **PyPI Package:** [topsis-sachingoyal-102303557](https://pypi.org/project/topsis-sachingoyal-102303557/1.0.0/)
+- **PyPI Package:** [topsis-sachin-102303557](https://pypi.org/project/topsis-sachin-102303557/1.0.0/)
 - **Web App:** [https://topsis-sachin-goyal-102303557.vercel.app/](https://topsis-sachin-goyal-102303557.vercel.app/)
 - **GitHub:** [https://github.com/SachinGoyal94/Topsis_SachinGoyal_102303557](https://github.com/SachinGoyal94/Topsis_SachinGoyal_102303557)
 
